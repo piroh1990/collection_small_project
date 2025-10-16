@@ -279,92 +279,15 @@ async function loadHighscores() {
             // Aktualisiere Highscore-Anzeige
             document.getElementById('highscore').textContent = result.data[0].score;
         } else {
-            list.innerHTML = '<li class="loading">Noch keine Highscores vorhanden</li>';
+            list.innerHTML = '<div class="loading">Noch keine Highscores vorhanden</div>';
         }
     } catch (error) {
         document.getElementById('scoreList').innerHTML = 
-            '<li class="error">Fehler beim Laden der Highscores</li>';
+            '<div class="error">Fehler beim Laden der Highscores</div>';
         console.error(error);
     }
 }
-
-// Kommentare laden
-async function loadComments() {
-    try {
-        const response = await fetch(API_URL + '?action=getComments');
-        const result = await response.json();
-        
-        const list = document.getElementById('commentList');
-        list.innerHTML = '';
-        
-        if (result.success && result.data.length > 0) {
-            result.data.forEach(comment => {
-                const div = document.createElement('div');
-                div.className = 'comment-item';
-                div.innerHTML = `
-                    <div class="comment-header">
-                        <span class="comment-name">${comment.player_name}</span>
-                        <span class="comment-date">${comment.created_at}</span>
-                    </div>
-                    <div class="comment-text">${comment.comment_text}</div>
-                `;
-                list.appendChild(div);
-            });
-        } else {
-            list.innerHTML = '<div class="loading">Noch keine Kommentare vorhanden</div>';
-        }
-    } catch (error) {
-        document.getElementById('commentList').innerHTML = 
-            '<div class="error">Fehler beim Laden der Kommentare</div>';
-        console.error(error);
-    }
-}
-
-// Kommentar hinzufügen
-async function addComment() {
-    const name = document.getElementById('playerName').value.trim();
-    const text = document.getElementById('commentText').value.trim();
-    
-    if (!name || !text) {
-        alert('Bitte fülle beide Felder aus!');
-        return;
-    }
-    
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                action: 'saveComment',
-                name: name,
-                comment: text
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            document.getElementById('commentText').value = '';
-            loadComments();
-        } else {
-            alert('Fehler beim Speichern: ' + result.message);
-        }
-    } catch (error) {
-        alert('Verbindungsfehler zum Server!');
-        console.error(error);
-    }
-}
-
-// Enter-Taste für Kommentare
-document.getElementById('commentText').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        addComment();
-    }
-});
 
 // Initialisierung
 drawBread();
 loadHighscores();
-loadComments();

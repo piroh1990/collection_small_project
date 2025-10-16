@@ -66,18 +66,6 @@
         </ul>
     </div>
 
-    <div class="comments">
-        <h3>💬 Kommentare</h3>
-        <div class="comment-input">
-            <input type="text" id="playerName" placeholder="Dein Name" maxlength="20">
-            <input type="text" id="commentText" placeholder="Dein Kommentar..." maxlength="200">
-            <button onclick="addComment()">Senden</button>
-        </div>
-        <div class="comment-list" id="commentList">
-            <div class="loading">Lade Kommentare...</div>
-        </div>
-    </div>
-
     <script src="game.js"></script>
 </body>
 </html>

@@ -10,7 +10,6 @@ In Toast Panic musst du so schnell wie möglich auf das Brot klicken, bevor die 
 - **Mehrere Brot-Skins**: Wähle zwischen verschiedenen Brotsorten (🍞🥖🥐🥨🥯)
 - **Level-System**: Jedes Level wird schwieriger
 - **Highscore-Tabelle**: Konkurriere mit anderen Spielern
-- **Kommentarbereich**: Teile deine Gedanken mit der Community
 - **Soundeffekte**: Optionale Soundeffekte für Interaktionen
 
 ## 🚀 Installation & Setup
@@ -80,12 +79,8 @@ Das Spiel verwendet eine einfache REST-API:
 ### GET /api.php?action=getHighscores
 Gibt die Top 10 Highscores zurück.
 
-### GET /api.php?action=getComments
-Gibt die letzten Kommentare zurück.
-
 ### POST /api.php
 - `action=saveScore`: Speichert einen neuen Highscore
-- `action=saveComment`: Speichert einen neuen Kommentar
 
 ## 🤝 Mitwirken
 

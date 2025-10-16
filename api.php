@@ -32,28 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
     }
-    elseif ($action === 'getComments') {
-        $conn = getDBConnection();
-        if (!$conn) {
-            echo json_encode(['success' => false, 'message' => 'Datenbankverbindung fehlgeschlagen']);
-            exit;
-        }
-        
-        try {
-            $stmt = $conn->prepare("
-                SELECT player_name, comment_text, DATE_FORMAT(created_at, '%d.%m.%Y %H:%i') as created_at 
-                FROM comments 
-                ORDER BY created_at DESC 
-                LIMIT 20
-            ");
-            $stmt->execute();
-            $comments = $stmt->fetchAll();
-            
-            echo json_encode(['success' => true, 'data' => $comments]);
-        } catch(PDOException $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
-        }
-    }
     else {
         echo json_encode(['success' => false, 'message' => 'Ungültige Aktion']);
     }
@@ -116,52 +94,6 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch(PDOException $e) {
             error_log("Database error: " . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'Fehler beim Speichern des Scores']);
-        }
-    }
-    elseif ($action === 'saveComment') {
-        $name = trim($data['name'] ?? '');
-        $comment = trim($data['comment'] ?? '');
-        
-        // Validierung
-        if (empty($name) || empty($comment)) {
-            echo json_encode(['success' => false, 'message' => 'Name und Kommentar dürfen nicht leer sein']);
-            exit;
-        }
-        
-        if (strlen($name) > 50) {
-            echo json_encode(['success' => false, 'message' => 'Name ist zu lang']);
-            exit;
-        }
-        
-        if (strlen($comment) > 500) {
-            echo json_encode(['success' => false, 'message' => 'Kommentar ist zu lang']);
-            exit;
-        }
-        
-        // XSS-Schutz
-        $name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
-        $comment = htmlspecialchars($comment, ENT_QUOTES, 'UTF-8');
-        
-        $conn = getDBConnection();
-        if (!$conn) {
-            echo json_encode(['success' => false, 'message' => 'Datenbankverbindung fehlgeschlagen']);
-            exit;
-        }
-        
-        try {
-            $stmt = $conn->prepare("
-                INSERT INTO comments (player_name, comment_text) 
-                VALUES (:name, :comment)
-            ");
-            $stmt->execute([
-                ':name' => $name,
-                ':comment' => $comment
-            ]);
-            
-            echo json_encode(['success' => true, 'message' => 'Kommentar gespeichert', 'id' => $conn->lastInsertId()]);
-        } catch(PDOException $e) {
-            error_log("Database error: " . $e->getMessage());
-            echo json_encode(['success' => false, 'message' => 'Fehler beim Speichern des Kommentars']);
         }
     }
     else {
