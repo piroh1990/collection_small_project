@@ -12,6 +12,7 @@ let gameState = {
     score: 0,
     level: 1,
     isPlaying: false,
+    isReady: true, // Game is ready to start on first click
     bread: { x: 400, y: 300, size: 80, burnLevel: 0 },
     timeLeft: gameConfig.initialMaxTime,
     maxTime: gameConfig.initialMaxTime,
@@ -126,8 +127,10 @@ function randomizeBreadPosition() {
 function startGame() {
     gameState.score = 0;
     gameState.level = 1;
-    gameState.isPlaying = true;
-    gameState.timeLeft = gameState.maxTime;
+    gameState.isPlaying = false; // Don't start timer yet
+    gameState.isReady = true; // Ready to start on first click
+    gameState.maxTime = gameConfig.initialMaxTime;
+    gameState.timeLeft = gameConfig.initialMaxTime;
     gameState.bread.burnLevel = 0;
     
     document.getElementById('score').textContent = '0';
@@ -135,8 +138,10 @@ function startGame() {
     document.getElementById('gameOver').style.display = 'none';
     
     randomizeBreadPosition();
-    lastTime = Date.now();
-    gameLoop();
+    
+    // Draw the bread but don't start the timer yet
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawBread();
 }
 
 // Haupt-Spielschleife
@@ -227,8 +232,6 @@ async function saveScore() {
 
 // Canvas-Klick
 canvas.addEventListener('click', (e) => {
-    if (!gameState.isPlaying) return;
-    
     const rect = canvas.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const clickY = e.clientY - rect.top;
@@ -239,23 +242,46 @@ canvas.addEventListener('click', (e) => {
     );
     
     if (distance < gameState.bread.size / 1.5) {
-        // Treffer!
-        gameState.score += Math.ceil(10 * gameState.level);
-        document.getElementById('score').textContent = gameState.score;
-        
-        playSound('click');
-        
-        // Level erhöhen alle 5 Treffer
-        if (gameState.score % 50 === 0) {
-            gameState.level++;
-            gameState.maxTime = Math.max(gameConfig.minTime, gameState.maxTime - gameConfig.timeDecreasePerLevel);
-            document.getElementById('level').textContent = gameState.level;
-            playSound('levelup');
+        // Wenn Spiel bereit ist aber noch nicht läuft, starte Timer mit erstem Treffer
+        if (gameState.isReady && !gameState.isPlaying) {
+            gameState.isPlaying = true;
+            gameState.isReady = false;
+            
+            // Erster Treffer zählt!
+            gameState.score += Math.ceil(10 * gameState.level);
+            document.getElementById('score').textContent = gameState.score;
+            
+            playSound('click');
+            
+            // Neues Brot
+            randomizeBreadPosition();
+            gameState.timeLeft = gameState.maxTime;
+            
+            lastTime = Date.now();
+            gameLoop();
+            return;
         }
         
-        // Neues Brot
-        randomizeBreadPosition();
-        gameState.timeLeft = gameState.maxTime;
+        // Wenn Spiel läuft: normaler Treffer
+        if (gameState.isPlaying) {
+            // Treffer!
+            gameState.score += Math.ceil(10 * gameState.level);
+            document.getElementById('score').textContent = gameState.score;
+            
+            playSound('click');
+            
+            // Level erhöhen alle 5 Treffer
+            if (gameState.score % 50 === 0) {
+                gameState.level++;
+                gameState.maxTime = Math.max(gameConfig.minTime, gameState.maxTime - gameConfig.timeDecreasePerLevel);
+                document.getElementById('level').textContent = gameState.level;
+                playSound('levelup');
+            }
+            
+            // Neues Brot
+            randomizeBreadPosition();
+            gameState.timeLeft = gameState.maxTime;
+        }
     }
 });
 
