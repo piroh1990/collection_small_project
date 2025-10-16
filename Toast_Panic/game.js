@@ -1,13 +1,20 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+// Config for difficulty adjustment
+const gameConfig = {
+    initialMaxTime: 2000, // Initial time in ms
+    timeDecreasePerLevel: 100, // Time decrease per level in ms
+    minTime: 200 // Minimum time to prevent it from going too low
+};
+
 let gameState = {
     score: 0,
     level: 1,
     isPlaying: false,
     bread: { x: 400, y: 300, size: 80, burnLevel: 0 },
-    timeLeft: 3000,
-    maxTime: 3000,
+    timeLeft: gameConfig.initialMaxTime,
+    maxTime: gameConfig.initialMaxTime,
     selectedSkin: '🍞',
     soundEnabled: true
 };
@@ -231,7 +238,7 @@ canvas.addEventListener('click', (e) => {
         Math.pow(clickY - gameState.bread.y, 2)
     );
     
-    if (distance < gameState.bread.size / 2) {
+    if (distance < gameState.bread.size / 1.5) {
         // Treffer!
         gameState.score += Math.ceil(10 * gameState.level);
         document.getElementById('score').textContent = gameState.score;
@@ -241,7 +248,7 @@ canvas.addEventListener('click', (e) => {
         // Level erhöhen alle 5 Treffer
         if (gameState.score % 50 === 0) {
             gameState.level++;
-            gameState.maxTime = Math.max(1000, gameState.maxTime - 200);
+            gameState.maxTime = Math.max(gameConfig.minTime, gameState.maxTime - gameConfig.timeDecreasePerLevel);
             document.getElementById('level').textContent = gameState.level;
             playSound('levelup');
         }
