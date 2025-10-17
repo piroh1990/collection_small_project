@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         try {
             $stmt = $conn->prepare("
                 SELECT player_name, score, level, DATE_FORMAT(created_at, '%d.%m.%Y %H:%i') as created_at 
-                FROM highscores 
+                FROM brot_highscores 
                 ORDER BY score DESC 
                 LIMIT 10
             ");
