@@ -6,7 +6,7 @@
 -- USE your_database_name;
 
 -- Highscores table
-CREATE TABLE IF NOT EXISTS highscores (
+CREATE TABLE IF NOT EXISTS brot_highscores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     player_name VARCHAR(50) NOT NULL,
     score INT NOT NULL DEFAULT 0,

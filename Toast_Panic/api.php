@@ -81,7 +81,7 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         try {
             $stmt = $conn->prepare("
-                INSERT INTO highscores (player_name, score, level) 
+                INSERT INTO brot_highscores (player_name, score, level) 
                 VALUES (:name, :score, :level)
             ");
             $stmt->execute([
